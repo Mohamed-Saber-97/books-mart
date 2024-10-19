@@ -33,9 +33,7 @@ public class ProductController {
 
     @PatchMapping
     public ResponseEntity<ProductDto> updateProduct(@RequestBody Product product) {
-        System.out.println(product.getId());
         ProductDto updatedProduct = productService.update(product);
-        System.out.println(updatedProduct);
         return ResponseEntity.ok(updatedProduct);
     }
 
