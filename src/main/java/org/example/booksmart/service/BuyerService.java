@@ -1,5 +1,7 @@
 package org.example.booksmart.service;
 
+import org.example.booksmart.converter.BuyerToBuyerDtoConverter;
+import org.example.booksmart.dto.BuyerDto;
 import org.example.booksmart.error.InsufficientFunds;
 import org.example.booksmart.error.InsufficientStock;
 import org.example.booksmart.model.Buyer;
@@ -35,8 +37,9 @@ public class BuyerService {
     private OrderService orderService;
 
 
-    public List<Buyer> findAll() {
-        return buyerRepository.findAll();
+    public List<BuyerDto> findAll() {
+        List<Buyer> buyers = buyerRepository.findAll();
+        return buyers.stream().map(BuyerToBuyerDtoConverter::convert).toList();
     }
 
     public Buyer findByPhoneNumber(String phoneNumber) {
@@ -48,7 +51,7 @@ public class BuyerService {
         return buyerRepository.save(buyer);
     }
 
-    public Buyer update(Buyer newBuyer) {
+    public BuyerDto update(Buyer newBuyer) {
         Buyer existingBuyer = buyerRepository.findById(newBuyer.getId()).orElse(null);
         if (existingBuyer == null) {
             return null;
@@ -58,7 +61,8 @@ public class BuyerService {
         existingBuyer.getAccount().setPassword(PasswordUtil.hashPassword(newBuyer.getAccount().getPassword()));
         existingBuyer.setCreditLimit(newBuyer.getCreditLimit());
         existingBuyer.setInterests(newBuyer.getInterests());
-        return buyerRepository.save(existingBuyer);
+        Buyer updatedBuyer = buyerRepository.save(existingBuyer);
+        return BuyerToBuyerDtoConverter.convert(updatedBuyer);
     }
 
     public boolean existsByEmail(String email) {
@@ -96,8 +100,9 @@ public class BuyerService {
 
     }
 
-    public Buyer findById(Long id) {
-        return buyerRepository.findById(id).orElse(null);
+    public BuyerDto findById(Long id) {
+        Buyer buyer = buyerRepository.findById(id).orElse(null);
+        return BuyerToBuyerDtoConverter.convert(buyer);
     }
 
     public void addProductToBuyerCart(Buyer buyer, Product product, int quantity) {
@@ -143,7 +148,7 @@ public class BuyerService {
     }
 
     public List<Order> searchOrders(Long buyerId, int pageNumber, int pageSize) {
-        Pageable pageable =  PageRequest.of(pageNumber, pageSize);
+        Pageable pageable = PageRequest.of(pageNumber, pageSize);
         return buyerRepository.findOrdersByBuyerIdAndIsDeletedFalse(buyerId, pageable).getContent();
     }
 
@@ -170,14 +175,14 @@ public class BuyerService {
         if (buyer == null || buyer.getWishlist() == null) return false;
         int initialWishlistSize = buyer.getWishlist().size();
 
-            Set<Product> currentWishlist = buyer.getWishlist();
-            Set<Long> productIds = currentWishlist.stream().map(Product::getId).collect(Collectors.toSet());
-            Set<Product> availableProductsInWishlist = new HashSet<>(productService.findByIds(productIds));
-            Set<Product> itemsToRemove = currentWishlist.stream().filter(item -> !availableProductsInWishlist.contains(item)).collect(Collectors.toSet());
-            buyer.removeFromWishlist(itemsToRemove);
-            buyerRepository.save(buyer);
+        Set<Product> currentWishlist = buyer.getWishlist();
+        Set<Long> productIds = currentWishlist.stream().map(Product::getId).collect(Collectors.toSet());
+        Set<Product> availableProductsInWishlist = new HashSet<>(productService.findByIds(productIds));
+        Set<Product> itemsToRemove = currentWishlist.stream().filter(item -> !availableProductsInWishlist.contains(item)).collect(Collectors.toSet());
+        buyer.removeFromWishlist(itemsToRemove);
+        buyerRepository.save(buyer);
 
-            return currentWishlist.size() == initialWishlistSize;
+        return currentWishlist.size() == initialWishlistSize;
     }
 
     @Transactional
@@ -217,6 +222,14 @@ public class BuyerService {
             return buyer;
         } catch (InsufficientStock | InsufficientFunds e) {
             throw e;
+        }
+    }
+
+    public void delete(Long id) {
+        Buyer buyer = buyerRepository.findById(id).orElse(null);
+        if (buyer != null) {
+            buyer.setIsDeleted(true);
+            buyerRepository.save(buyer);
         }
     }
 }
