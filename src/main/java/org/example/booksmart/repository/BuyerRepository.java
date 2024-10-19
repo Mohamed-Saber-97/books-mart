@@ -6,6 +6,7 @@ import org.example.booksmart.model.Order;
 import org.example.booksmart.model.Product;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -133,11 +134,9 @@ public interface BuyerRepository extends JpaRepository< Buyer, Long > {
     }
     
     @Query("SELECT b FROM Buyer b WHERE b.isDeleted = false")
-    Page< Buyer > findBuyersByIsDeletedFalse(PageRequest pageRequest);
+    Page< Buyer > findBuyersByIsDeletedFalse(Pageable pageable);
     
     @Query("SELECT o FROM Order o WHERE o.buyer.id = :buyerId AND o.isDeleted = false")
     Page< Order > findOrdersByBuyerIdAndIsDeletedFalse(
-            Long buyerId,
-            PageRequest pageRequest
-                                                      );
+            Long buyerId, Pageable pageable);
 }
