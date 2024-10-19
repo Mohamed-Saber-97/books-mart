@@ -1,5 +1,6 @@
 package org.example.booksmart.controller;
 
+import org.example.booksmart.dto.ProductDto;
 import org.example.booksmart.model.Product;
 import org.example.booksmart.service.ProductService;
 import org.springframework.http.ResponseEntity;
@@ -11,30 +12,28 @@ import java.util.List;
 @RequestMapping("/products")
 public class ProductController {
 
-    @GetMapping
-    public String getProducts() {
-        return "Hello World";
+//    @GetMapping
+//    public String getProducts() {
+//        return "Hello World";
+//    }
+
+    private ProductService productService;
+
+    public ProductController(ProductService productService) {
+        this.productService = productService;
     }
 
-//    private ProductService productService;
-//
-//    public ProductController(ProductService productService) {
-//        this.productService = productService;
-//    }
-//
-//    @GetMapping
-//    // get all products
-//    public ResponseEntity<List<Product>> getAllProducts() {
-//        List<Product> products = productService.findAllAvailable();
-//        return ResponseEntity.ok(products);
-//    }
+    @GetMapping
+    public ResponseEntity<List<ProductDto>> getAllProducts() {
+        List<ProductDto> products = productService.findAllAvailable();
+        return ResponseEntity.ok(products);
+    }
 
-//    @GetMapping("/{id}")
-//    // get product by id
-//    public Response getProductById(@PathVariable Long id) {
-//        Product product = productService.getProductById(id);
-//        return Response.ok(product).build();
-//    }
+    @GetMapping("/{id}")
+    public ResponseEntity<Product> getProductById(@PathVariable Long id) {
+        Product product = productService.findAvailableProductById(id);
+        return ResponseEntity.ok(product);
+    }
 //
 //    // update product
 //    @PatchMapping("/{id}")

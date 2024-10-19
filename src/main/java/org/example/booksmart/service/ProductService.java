@@ -1,5 +1,7 @@
 package org.example.booksmart.service;
 
+import org.example.booksmart.converter.ProductToProductDtoConverter;
+import org.example.booksmart.dto.ProductDto;
 import org.example.booksmart.model.Product;
 import org.example.booksmart.repository.ProductRepository;
 import org.example.booksmart.repository.ProductSpecification;
@@ -21,8 +23,6 @@ public class ProductService {
     ProductRepository productRepository;
 
 
-
-
     public Product findById(Long id) {
         return productRepository.findById(id).orElse(null);
     }
@@ -41,8 +41,11 @@ public class ProductService {
         return (productRepository.findAll(productSpecification, pageable)).getContent();
     }
 
-    public List<Product> findAllAvailable() {
-        return productRepository.findAllAvailable();
+    public List<ProductDto> findAllAvailable() {
+        List<Product> products = productRepository.findAllAvailable();
+        return products.stream().map(ProductToProductDtoConverter::convert).toList();
+
+//        return productRepository.findAllAvailable();
     }
 
     public Product findAvailableProductById(Long id) {
@@ -66,7 +69,7 @@ public class ProductService {
     }
 
     public Map<Product, Integer> findByIdsWithQuantities(Iterable<Long> ids) {
-        List<Object[]> results =  productRepository.findByIdsWithQuantities(ids);
+        List<Object[]> results = productRepository.findByIdsWithQuantities(ids);
 
         Map<Product, Integer> productQuantityMap = new HashMap<>();
         for (Object[] result : results) {

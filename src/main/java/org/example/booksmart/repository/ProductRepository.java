@@ -32,5 +32,4 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     @Query("SELECT p, p.quantity FROM Product p WHERE p.id IN :productIds AND p.isDeleted = false AND p.quantity > 0")
     List<Object[]> findByIdsWithQuantities(@Param("productIds") Iterable<Long> ids);
-
 }
