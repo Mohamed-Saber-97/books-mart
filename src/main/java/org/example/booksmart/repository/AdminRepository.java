@@ -6,5 +6,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface AdminRepository extends JpaRepository< Admin, Long > {
     public Admin findAdminByAccount_EmailAndIsDeletedFalse(String email);
     
-    public Admin findAdminByAccount_PhoneAndIsDeletedFalse(String phone);
+    public Admin findAdminByAccount_PhoneNumberAndIsDeletedFalse(String phone);
 }

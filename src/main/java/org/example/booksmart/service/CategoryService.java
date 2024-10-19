@@ -27,13 +27,14 @@ public class CategoryService {
     }
 
     public boolean existsByName(String name) {
-        return categoryRepository.existsByCategoryName(name);
+        return categoryRepository.existsByName(name);
     }
 
     public Category update(Category category) {
         return categoryRepository.save(category);
     }
+
     public Category findByName(String name) {
-        return categoryRepository.findByCategoryName(name);
+        return categoryRepository.findByName(name);
     }
 }

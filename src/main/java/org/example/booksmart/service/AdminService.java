@@ -36,6 +36,6 @@ public class AdminService {
         return adminRepository.findAdminByAccount_EmailAndIsDeletedFalse(email);
     }
     public Admin findByPhoneNumber(String phoneNumber) {
-        return adminRepository.findAdminByAccount_PhoneAndIsDeletedFalse(phoneNumber);
+        return adminRepository.findAdminByAccount_PhoneNumberAndIsDeletedFalse(phoneNumber);
     }
 }
