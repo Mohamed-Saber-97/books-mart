@@ -1,5 +1,6 @@
 package org.example.booksmart.service;
 
+import jakarta.transaction.Transactional;
 import org.example.booksmart.converter.ProductToProductDtoConverter;
 import org.example.booksmart.dto.ProductDto;
 import org.example.booksmart.model.Product;
@@ -44,20 +45,22 @@ public class ProductService {
     public List<ProductDto> findAllAvailable() {
         List<Product> products = productRepository.findAllAvailable();
         return products.stream().map(ProductToProductDtoConverter::convert).toList();
-
-//        return productRepository.findAllAvailable();
     }
 
-    public Product findAvailableProductById(Long id) {
-        return productRepository.findByIdAndIsDeletedIsFalse(id);
+    public ProductDto findAvailableProductById(Long id) {
+        Product product = productRepository.findByIdAndIsDeletedIsFalse(id);
+        return ProductToProductDtoConverter.convert(product);
     }
 
     public Product save(Product product) {
         return productRepository.save(product);
     }
 
-    public Product update(Product product) {
-        return productRepository.save(product);
+    @Transactional
+    public ProductDto update(Product product) {
+        Product updatedProduct = productRepository.save(product);
+        System.out.println(updatedProduct);
+        return ProductToProductDtoConverter.convert(updatedProduct);
     }
 
     public boolean existsByIsbn(String isbn) {
@@ -78,5 +81,13 @@ public class ProductService {
             productQuantityMap.put(product, quantity);
         }
         return productQuantityMap;
+    }
+
+    public void delete(Long id) {
+        Product product = productRepository.findById(id).orElse(null);
+        if (product != null) {
+            product.setIsDeleted(true);
+            productRepository.save(product);
+        }
     }
 }

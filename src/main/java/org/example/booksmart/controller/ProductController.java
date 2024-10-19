@@ -1,5 +1,6 @@
 package org.example.booksmart.controller;
 
+import org.example.booksmart.converter.ProductToProductDtoConverter;
 import org.example.booksmart.dto.ProductDto;
 import org.example.booksmart.model.Product;
 import org.example.booksmart.service.ProductService;
@@ -12,12 +13,7 @@ import java.util.List;
 @RequestMapping("/products")
 public class ProductController {
 
-//    @GetMapping
-//    public String getProducts() {
-//        return "Hello World";
-//    }
-
-    private ProductService productService;
+    private final ProductService productService;
 
     public ProductController(ProductService productService) {
         this.productService = productService;
@@ -30,29 +26,29 @@ public class ProductController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Product> getProductById(@PathVariable Long id) {
-        Product product = productService.findAvailableProductById(id);
-        return ResponseEntity.ok(product);
+    public ResponseEntity<ProductDto> getProductById(@PathVariable Long id) {
+        ProductDto productDto = productService.findAvailableProductById(id);
+        return ResponseEntity.ok(productDto);
     }
-//
-//    // update product
-//    @PatchMapping("/{id}")
-//    public Response updateProduct(@PathVariable Long id, @RequestBody Product product) {
-//        Product updatedProduct = productService.updateProduct(id, product);
-//        return Response.ok(updatedProduct).build();
-//    }
-//
-//    // delete product
-//    @DeleteMapping("/{id}")
-//    public Response deleteProduct(@PathVariable Long id) {
-//        productService.deleteProduct(id);
-//        return Response.noContent().build();
-//    }
-//
-//    // add product
-//    @PostMapping
-//    public Response addProduct(@RequestBody Product product) {
-//        Product newProduct = productService.addProduct(product);
-//        return Response.ok(newProduct).build();
-//    }
+
+    @PatchMapping
+    public ResponseEntity<ProductDto> updateProduct(@RequestBody Product product) {
+        System.out.println(product.getId());
+        ProductDto updatedProduct = productService.update(product);
+        System.out.println(updatedProduct);
+        return ResponseEntity.ok(updatedProduct);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteProduct(@PathVariable Long id) {
+        productService.delete(id);
+        return ResponseEntity.ok("Product deleted successfully");
+    }
+
+    @PostMapping
+    public ResponseEntity<ProductDto> addProduct(@RequestBody Product product) {
+        Product newProduct = productService.save(product);
+        ProductDto productDto = ProductToProductDtoConverter.convert(newProduct);
+        return ResponseEntity.ok(productDto);
+    }
 }

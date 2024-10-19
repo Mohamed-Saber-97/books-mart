@@ -54,7 +54,7 @@ public class Product extends BaseEntity< Long > {
     @ColumnDefault(value = "0")
     private Integer quantity;
     
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
     
